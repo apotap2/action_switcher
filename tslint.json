@@ -1,0 +1,33 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "linterOptions": {
+        "exclude": [
+            "webpack.config.js",
+            "src/reducers/server.ts"
+        ]
+    },
+    "jsRules": {
+    },
+    "rules": {
+        "ordered-imports": false,
+        "no-empty-interface": false,
+        "no-empty": false,
+        "indent": [true, "tabs"],
+        "member-ordering": false,
+        "object-literal-sort-keys": false,
+        "linebreak-style": [true, "LF"],
+        "max-classes-per-file": [false],
+        "no-string-literal": false,
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format",
+            "allow-pascal-case",
+            "allow-leading-underscore"
+        ]    
+    },
+    "rulesDirectory": []
+}

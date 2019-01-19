@@ -1,0 +1,38 @@
+{
+  "name": "action_switcher",
+  "version": "1.0.0",
+  "description": "Action switcher for redux",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "test": "jest --config jestconfig.json",
+    "build": "tsc",
+    "lint": "tslint -p tsconfig.json",
+    "prepare" : "npm run build",
+    "prepublishOnly" : "npm test && npm run lint",
+    "preversion" : "npm run lint",
+    "version" : "git add -A src",
+    "postversion" : "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apotap2/action_switcher.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/apotap2/action_switcher/issues"
+  },
+  "homepage": "https://github.com/apotap2/action_switcher#readme",
+  "devDependencies": {
+    "@types/jest": "^23.3.13",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "tslint": "^5.12.1",
+    "typescript": "^3.2.4"
+  },
+  "files": [
+    "lib/**/*"
+  ]
+}
