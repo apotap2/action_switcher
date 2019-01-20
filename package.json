@@ -18,8 +18,8 @@
     "type": "git",
     "url": "git+https://github.com/apotap2/action_switcher.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["ActionSwitcher", "redux", "typescript", "combineReducers", "flat map", "flat switch"],
+  "author": "Alexander Potapchuk",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/apotap2/action_switcher/issues"
