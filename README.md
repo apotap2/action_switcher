@@ -40,6 +40,8 @@ interface IActionWithStringValue extends IAction {
 and create next action factories:
 
 ```typescript
+const switcher = new ActionSwitcher<IState1>({});
+
 const setA = createActionFactory(switcher, {
     apply(state: IState1, action: IActionWithStringValue): IState1 {
         return { ...state, a: action.value };
@@ -115,4 +117,19 @@ let state4 = {} as IState4;
 state4 = switcher.apply(state4, setA({value: "hello"}));
 state4 = switcher.apply(state4, setD({value: "hello3"}));
 expect(state4).toEqual({a: "hello", e: {d: "hello3"}});
+```
+
+As a bonus, when you attach switchers to parent/brother switcher, it moves rules from the brother/child switcher to itself,
+so you will have only one map "action type" -> "action applier".
+
+It does not set initial state for you, you can get it as `rootSwitcher.getInitialState();` and use it as 
+
+```typescript
+const rootReducer = (state: IState, action: any) => {
+	return rootSwitcher.apply(state, action);
+};
+
+const initialState = rootSwitcher.getInitialState();
+
+createStore(rootReducer, initialState);
 ```
