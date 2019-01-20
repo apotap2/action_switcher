@@ -100,7 +100,7 @@ export function createActionFactory<S extends IAction, T>(
 		switcher: ActionSwitcher<T>,
 		partial: Partial<IActionFactory<S, T>>,
 		inSwitcherAlias: string | null = null,
-	): (partial?: Partial<S>) => Partial<S> {
+	): (partial?: Partial<S>) => S {
 	const type: string = partial.TYPE ? partial.TYPE : String(++actionId);
 	if (!partial.apply) {
 		throw new Error("apply should be provided");
