@@ -2,7 +2,7 @@
 
 # Usage
 
-So the "switcher" is basically ts-friendly reduce "function", which also has "combineReducers" functionality.
+So the "switcher" is basically typescript-friendly reduce "function", which also has "combineReducers" functionality.
 
 Pretty small library, you can use when:
 * you want to have "unnamed" actions (action types will be just "1", "2" etc)
