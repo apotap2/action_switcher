@@ -145,3 +145,5 @@ const initialState = rootSwitcher.getInitialState();
 
 createStore(rootReducer, initialState);
 ```
+
+Example of usage can be seen at: [electron-react-typescript-boilerplate](https://github.com/apotap2/electron-react-typescript-boilerplate) fork.
