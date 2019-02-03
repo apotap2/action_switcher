@@ -5,7 +5,7 @@
 So the "switcher" is basically typescript-friendly reduce "function", which also has "combineReducers" functionality.
 
 Pretty small library, you can use when:
-* you want to have "unnamed" actions (action types will be just "1", "2" etc)
+* you want to have "unnamed" actions (action types will be just "1", "2" etc), you can give type name though
 * you want to have action factory and the code that will change state in one place
 * you want to reuse code when you have the same state signature in several places
 
@@ -62,6 +62,18 @@ state1 = switcher.apply(state1, setC({value: "world"}));
 we created here 2 action factories which are using the same action signature, but have different types (they will be here "1", "2",
 as we didn't specify type explicitly). `switcher.apply` is the reducer function. So in normal application it will be used as
 `dispatch(setA({value: "hello"}))`
+
+To create an action factory for actions with known type, use next:
+
+```typescript
+const setC = createActionFactory(switcher, {
+    apply(state: IState1, action: IActionWithStringValue): IState1 {
+        return { ...state, c: action.value };
+    },
+    TYPE: "set_c",
+});
+
+```
 
 We could also create a switcher for intersection types:
 

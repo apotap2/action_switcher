@@ -109,7 +109,7 @@ export function createActionFactory<S extends IAction, T>(
 		throw new Error("don't provide your create");
 	}
 	const create = (partialAction?: Partial<S>) => {
-		return {type, ...partialAction};
+		return {...partialAction, type};
 	};
 	const res = {
 		TYPE: type,
