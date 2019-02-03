@@ -4,13 +4,16 @@ export interface IAction {
 
 type Applier<T, S extends IAction> = (state: T, action: S) => T;
 
+export interface ICreateAction<S extends IAction> {
+	(partial?: Partial<S>): S;
+	TYPE: string;
+}
+
 interface IActionFactory<S extends IAction, T> {
 	TYPE: string;
 	apply: Applier<T, S>;
-	create(partial?: Partial<S>): S;
+	create: ICreateAction<S>;
 }
-
-export type CreateAction<S extends IAction> = (partial?: Partial<S>) => S;
 
 export class ActionSwitcher<T> {
 	public factories: { [alias: string]: (partial?: Partial<IAction>) => IAction } = {};
@@ -100,7 +103,7 @@ export function createActionFactory<S extends IAction, T>(
 		switcher: ActionSwitcher<T>,
 		partial: Partial<IActionFactory<S, T>>,
 		inSwitcherAlias: string | null = null,
-	): (partial?: Partial<S>) => S {
+	): ICreateAction<S> {
 	const type: string = partial.TYPE ? partial.TYPE : String(++actionId);
 	if (!partial.apply) {
 		throw new Error("apply should be provided");
@@ -108,9 +111,13 @@ export function createActionFactory<S extends IAction, T>(
 	if (partial.create) {
 		throw new Error("don't provide your create");
 	}
-	const create = (partialAction?: Partial<S>) => {
-		return {...partialAction, type};
-	};
+	const create: ICreateAction<S> = Object.assign(
+		(partialAction?: Partial<S>): S => ({ ...partialAction, type } as S),
+		{TYPE: type},
+	);
+
+	create.TYPE = type;
+
 	const res = {
 		TYPE: type,
 		create,

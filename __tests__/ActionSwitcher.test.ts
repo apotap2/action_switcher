@@ -1,4 +1,4 @@
-import { ActionSwitcher, createActionFactory, IAction, CreateAction } from "../src/index";
+import { ActionSwitcher, createActionFactory, IAction, ICreateAction } from "../src/index";
 
 interface IState1 {
 	a: string;
@@ -64,7 +64,7 @@ test("should be able to use action factory by alias", () => {
 		},
 	}, "setA");
 
-	const setA = switcher.factories.setA as CreateAction<IActionWithStringValue>;
+	const setA = switcher.factories.setA as ICreateAction<IActionWithStringValue>;
 
 	let state1 = {} as IState1;
 	state1 = switcher.apply(state1, setA({ value: "hello" }));
@@ -84,6 +84,7 @@ test("should be able to create actions with predefined type", () => {
 			return { ...state, a: action.value };
 		},
 	});
+	expect(setA.TYPE).toEqual("SetA");
 
 	const setAAction = setA({ value: "test" });
 	expect(setAAction).toEqual({ type: "SetA", value: "test" });
