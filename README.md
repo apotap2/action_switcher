@@ -133,6 +133,8 @@ expect(state4).toEqual({a: "hello", e: {d: "hello3"}});
 
 As a bonus, when you attach switchers to parent/brother switcher, it moves rules from the brother/child switcher to itself,
 so you will have only one map "action type" -> "action applier".
+Additionally `attachChild` takes 3-rd boolean argument (false by default) to "enhance" action type with field name.
+For example if `switcher.attachChild("e", switcher2);` would create an action with type `action_type` then `switcher.attachChild("e", switcher2, true);` would create `e/action_type`.
 
 It does not set initial state for you, you can get it as `rootSwitcher.getInitialState();` and use it as 
 

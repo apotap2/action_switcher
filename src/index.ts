@@ -6,7 +6,7 @@ type Applier<T, S extends IAction> = (state: T, action: S) => T;
 
 export interface ICreateAction<S extends IAction> {
 	(partial?: Partial<S>): S;
-	TYPE: string;
+	TYPE(): string;
 }
 
 interface IActionFactory<S extends IAction, T> {
@@ -16,8 +16,8 @@ interface IActionFactory<S extends IAction, T> {
 }
 
 export class ActionSwitcher<T> {
-	public factories: { [alias: string]: (partial?: Partial<IAction>) => IAction } = {};
-	private _rules: { [TYPE: string]: Applier<T, IAction>; } = {};
+	public factories: { [alias: string]: ICreateAction<IAction> } = {};
+	private _rules: { [TYPE: string]: IActionFactory<IAction, T>; } = {};
 	private _initialState: T;
 	private _children: {[field: string]: ActionSwitcher<any>} = {};
 	private _brothers: Array<ActionSwitcher<any>> = [];
@@ -41,31 +41,34 @@ export class ActionSwitcher<T> {
 	}
 
 	public with<S extends IAction>(factory: IActionFactory<S, T>): ActionSwitcher<T> {
-		return this.on(factory.TYPE, factory.apply);
+		return this.on(factory.TYPE, factory);
 	}
 
-	public on<S extends IAction>(actionType: string, applier: Applier<T, S>): ActionSwitcher<T> {
-		this._rules[actionType] = applier;
+	public on<S extends IAction>(actionType: string, factory: IActionFactory<S, T>): ActionSwitcher<T> {
+		this._rules[actionType] = factory;
 		return this;
 	}
 
 	public apply(state: T, action: IAction): T {
-		const applier = this._rules[action.type];
-		if (applier) {
-			const newState = applier(state, action);
+		const factory = this._rules[action.type];
+		if (factory) {
+			const newState = factory.apply(state, action);
 			return newState;
 		}
 		return state;
 	}
 
-	public attachChild<С extends keyof T>(field: С, child: ActionSwitcher<any>) {
+	public attachChild<С extends keyof T>(field: С, child: ActionSwitcher<any>, useFieldInType: boolean = false) {
 		if (this._children.hasOwnProperty(field as string)) {
 			throw new Error(`already has action switcher for the field ${field}`);
 		}
 
 		this._children[field as string] = child;
 		Object.keys(child._rules).forEach((TYPE) => {
-			const oldApplier = child._rules[TYPE];
+			const factory = child._rules[TYPE];
+			const typeToUse = useFieldInType ? `${field}/${TYPE}` : TYPE;
+			factory.TYPE = typeToUse;
+			const oldApplier = factory.apply;
 			const newApplier = (state: T, action: IAction): T => {
 				const childState = state[field];
 				const newChildState = oldApplier(childState, action);
@@ -74,16 +77,18 @@ export class ActionSwitcher<T> {
 				}
 				return {...state, [field]: newChildState};
 			};
-			this.on(TYPE, newApplier);
+			factory.apply = newApplier;
+			this.on(typeToUse, factory);
 		});
 		child._rules = {};
 	}
 
-	public attachBrother<T2>(brother: ActionSwitcher<T2>) {
+	public attachBrother<T2 extends Partial<T>>(brother: ActionSwitcher<T2>) {
 		this._brothers.push(brother);
 		Object.keys(brother._rules).forEach((TYPE) => {
-			const oldApplier = brother._rules[TYPE];
-			const newApplier = (state: T, action: IAction): T => {
+			const factory = brother._rules[TYPE];
+			const oldApplier = factory.apply;
+			const newApplier = (state: T2, action: IAction): T2 => {
 				const broState = (state as any) as T2;
 				const newBroState = oldApplier(broState, action);
 				if (broState === newBroState) {
@@ -91,7 +96,8 @@ export class ActionSwitcher<T> {
 				}
 				return {...state, ...newBroState};
 			};
-			this.on(TYPE, newApplier);
+			factory.apply = newApplier;
+			this.on(TYPE, factory as unknown as IActionFactory<IAction, T>);
 		});
 		brother._rules = {};
 	}
@@ -111,18 +117,17 @@ export function createActionFactory<S extends IAction, T>(
 	if (partial.create) {
 		throw new Error("don't provide your create");
 	}
-	const create: ICreateAction<S> = Object.assign(
-		(partialAction?: Partial<S>): S => ({ ...partialAction, type } as S),
-		{TYPE: type},
-	);
-
-	create.TYPE = type;
 
 	const res = {
 		TYPE: type,
-		create,
 		apply: partial.apply,
 	} as IActionFactory<S, T>;
+
+	const create: ICreateAction<S> = Object.assign(
+		(partialAction?: Partial<S>): S => ({ ...partialAction, type: res.TYPE } as S),
+	);
+	create.TYPE = () => res.TYPE;
+	res.create = create;
 
 	switcher.with(res);
 	if (inSwitcherAlias) {
