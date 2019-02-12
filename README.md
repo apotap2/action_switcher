@@ -149,3 +149,29 @@ createStore(rootReducer, initialState);
 ```
 
 Example of usage can be seen at: [electron-react-typescript-boilerplate](https://github.com/apotap2/electron-react-typescript-boilerplate) fork.
+
+# GENERAL SWITCHERS/STATES
+
+# Error/Success
+IErrorSuccessState is a simple state (import from `general/states`), defined as 
+
+```typescript
+export interface IErrorSuccessState {
+	lastError: string | null;
+	lastSuccess: string | null;
+}
+```
+
+The corresonding switcher (import from `general/switchers`) can be created as createErrorSuccessSwitcher and defines
+next actions (action factories): `RESET_ERROR_AND_SUCCESS` to reset both error and success, `GOT_ERROR` to set error only, `GOT_SUCCESS_RESULT` to set success result only. `createErrorSuccessSwitcher` creates action switcher and to get an access
+to corresponding action factories you can cast the `switcher.factories` to `IErrorSuccessFactories` defined as 
+
+```typescript
+export interface IErrorSuccessFactories {
+	resetErrorAndSuccess: ICreateAction<IAction>;
+	gotError: ICreateAction<IActionWithMessage>;
+	gotSuccessResult: ICreateAction<IActionWithMessage>;
+}
+```
+
+

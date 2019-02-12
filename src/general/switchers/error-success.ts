@@ -20,25 +20,28 @@ export function createErrorSuccessSwitcher(
 		apply(state: IErrorSuccessState): IErrorSuccessState {
 			return { ...state, lastError: null, lastSuccess: null };
 		},
+		TYPE: "RESET_ERROR_AND_SUCCESS",
 	}, "resetErrorAndSuccess");
 
 	createActionFactory(switcher, {
 		apply(state: IErrorSuccessState, action: IActionWithMessage): IErrorSuccessState {
 			return { ...state, lastError: action.message, lastSuccess: null };
 		},
+		TYPE: "GOT_ERROR",
 	}, "gotError");
 
 	createActionFactory(switcher, {
 		apply(state: IErrorSuccessState, action: IActionWithMessage): IErrorSuccessState {
 			return { ...state, lastError: null, lastSuccess: action.message };
 		},
+		TYPE: "GOT_SUCCESS_RESULT",
 	}, "gotSuccessResult");
 
 	return switcher;
 }
 
 export interface IErrorSuccessFactories {
-	resetErrorAndSuccess: ICreateAction<IActionWithMessage>;
+	resetErrorAndSuccess: ICreateAction<IAction>;
 	gotError: ICreateAction<IActionWithMessage>;
 	gotSuccessResult: ICreateAction<IActionWithMessage>;
 }
