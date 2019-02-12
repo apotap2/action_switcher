@@ -84,7 +84,7 @@ test("should be able to create actions with predefined type", () => {
 			return { ...state, a: action.value };
 		},
 	});
-	expect(setA.TYPE).toEqual("SetA");
+	expect(setA.TYPE()).toEqual("SetA");
 
 	const setAAction = setA({ value: "test" });
 	expect(setAAction).toEqual({ type: "SetA", value: "test" });
@@ -139,6 +139,38 @@ test("should be able to attach child switcher", () => {
 
 	switcher.attachChild("e", switcher2);
 
+	let state4 = {} as IState4;
+
+	state4 = switcher.apply(state4, setA({ value: "hello" }));
+	state4 = switcher.apply(state4, setD({ value: "hello3" }));
+	expect(state4).toEqual({ a: "hello", e: { d: "hello3" } });
+});
+
+test("should be able to attach child switcher and change action type path", () => {
+	const switcher = new ActionSwitcher<IState4>({});
+
+	const setA = createActionFactory(switcher, {
+		apply(state: IState4, action: IActionWithStringValue): IState4 {
+			return { ...state, a: action.value };
+		},
+	});
+
+	const switcher2 = new ActionSwitcher<IState2>({});
+
+	const setD = createActionFactory(switcher2, {
+		apply(state: IState2, action: IActionWithStringValue): IState2 {
+			return { ...state, d: action.value };
+		},
+		TYPE: "setD",
+	}, "some");
+
+	expect(setD.TYPE()).toEqual("setD"); // setD before attachment
+
+	switcher.attachChild("e", switcher2, true);
+	expect(setD.TYPE()).toEqual("e/setD"); // e/setD before attachment
+	expect(setD({value: "asdf"})).toEqual({ type: "e/setD", value: "asdf" });
+
+	// ensure previous behaviour is not broken
 	let state4 = {} as IState4;
 
 	state4 = switcher.apply(state4, setA({ value: "hello" }));

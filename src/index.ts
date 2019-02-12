@@ -6,7 +6,7 @@ type Applier<T, S extends IAction> = (state: T, action: S) => T;
 
 export interface ICreateAction<S extends IAction> {
 	(partial?: Partial<S>): S;
-	TYPE: string;
+	TYPE(): string;
 }
 
 interface IActionFactory<S extends IAction, T> {
@@ -16,7 +16,7 @@ interface IActionFactory<S extends IAction, T> {
 }
 
 export class ActionSwitcher<T> {
-	public factories: { [alias: string]: (partial?: Partial<IAction>) => IAction } = {};
+	public factories: { [alias: string]: ICreateAction<IAction> } = {};
 	private _rules: { [TYPE: string]: IActionFactory<IAction, T>; } = {};
 	private _initialState: T;
 	private _children: {[field: string]: ActionSwitcher<any>} = {};
@@ -65,8 +65,8 @@ export class ActionSwitcher<T> {
 
 		this._children[field as string] = child;
 		Object.keys(child._rules).forEach((TYPE) => {
-			const typeToUse = useFieldInType ? `field/${TYPE}` : TYPE;
-			const factory = child._rules[typeToUse];
+			const factory = child._rules[TYPE];
+			const typeToUse = useFieldInType ? `${field}/${TYPE}` : TYPE;
 			factory.TYPE = typeToUse;
 			const oldApplier = factory.apply;
 			const newApplier = (state: T, action: IAction): T => {
@@ -117,18 +117,17 @@ export function createActionFactory<S extends IAction, T>(
 	if (partial.create) {
 		throw new Error("don't provide your create");
 	}
-	const create: ICreateAction<S> = Object.assign(
-		(partialAction?: Partial<S>): S => ({ ...partialAction, type } as S),
-		{TYPE: type},
-	);
-
-	create.TYPE = type;
 
 	const res = {
 		TYPE: type,
-		create,
 		apply: partial.apply,
 	} as IActionFactory<S, T>;
+
+	const create: ICreateAction<S> = Object.assign(
+		(partialAction?: Partial<S>): S => ({ ...partialAction, type: res.TYPE } as S),
+	);
+	create.TYPE = () => res.TYPE;
+	res.create = create;
 
 	switcher.with(res);
 	if (inSwitcherAlias) {
