@@ -16,6 +16,10 @@ interface IState4 extends IState1 {
 	e: IState2;
 }
 
+interface IState5 {
+	st2: IState2[];
+}
+
 interface IActionWithStringValue extends IAction {
 	value: string;
 }
@@ -49,6 +53,7 @@ test("should create action factory and register it in switcher reducer for simpl
 	});
 
 	let state1 = {} as IState1;
+	expect(setA({ value: "hello" })).toEqual({ value: "hello", type: "1" });
 	state1 = switcher.apply(state1, setA({ value: "hello" }));
 	state1 = switcher.apply(state1, setB({ value: 42 }));
 	state1 = switcher.apply(state1, setC({ value: "world" }));
@@ -184,4 +189,25 @@ test("should get combined initial state", () => {
 	switcher.attachChild("e", switcher2);
 
 	expect(switcher.getInitialState()).toEqual({ a: "some", b: 22, c: "world", e: { d: "wait" } });
+});
+
+test("should be able to attach to child array", () => {
+	const switcher = new ActionSwitcher<IState5>({ });
+	const switcher2 = new ActionSwitcher<IState2>({ d: "wait" });
+
+	const setD = createActionFactory(switcher2, {
+		apply(state: IState2, action: IActionWithStringValue): IState2 {
+			return { ...state, d: action.value };
+		},
+		TYPE: "setd",
+	});
+
+	switcher.attachArrayChild("st2", switcher2, 3, true);
+	let state2 = switcher.getInitialState();
+	expect(state2).toEqual({ st2: [ { d: "wait" }, { d: "wait" }, { d: "wait" } ] });
+
+	expect(setD({ idx: 1, value: "hello3" }).type).toEqual("st2/setd");
+
+	state2 = switcher.apply(state2, setD({ idx: 1, value: "hello3" }));
+	expect(state2).toEqual({ st2: [ { d: "wait" }, { d: "hello3" }, { d: "wait" } ] });
 });

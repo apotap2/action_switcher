@@ -136,6 +136,12 @@ so you will have only one map "action type" -> "action applier".
 Additionally `attachChild` takes 3-rd boolean argument (false by default) to "enhance" action type with field name.
 For example if `switcher.attachChild("e", switcher2);` would create an action with type `action_type` then `switcher.attachChild("e", switcher2, true);` would create `e/action_type`.
 
+Switcher can be attached to a child array
+```typescript
+switcher.attachArrayChild("st2", switcher2, 3, true);
+```
+which means - attach to child array state at field st2, initial state should have 3 values, use `st2/` as type prefix
+
 It does not set initial state for you, you can get it as `rootSwitcher.getInitialState();` and use it as 
 
 ```typescript
