@@ -168,7 +168,12 @@ export function createActionFactory<S extends IAction, T>(
 	} as IActionFactory<S, T>;
 
 	const create: ICreateAction<S> = Object.assign(
-		(partialAction?: Partial<S>): S => ({ ...partialAction, idx: partialAction.idx, type: res.TYPE } as S),
+		(partialAction?: Partial<S>): S => {
+			if (partialAction) {
+				return { ...partialAction, idx: partialAction.idx, type: res.TYPE } as S;
+			}
+			return { ...partialAction, idx: undefined, type: res.TYPE } as S;
+		},
 	);
 	create.TYPE = () => res.TYPE;
 	res.create = create;
