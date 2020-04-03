@@ -1,6 +1,6 @@
 {
   "name": "action_switcher",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Action switcher for redux",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -35,7 +35,7 @@
   "devDependencies": {
     "@types/jest": "^23.3.13",
     "braces": ">=2.3.1",
-    "handlebars": ">=4.0.14",
+    "handlebars": "^4.7.5",
     "jest": "^24.8.0",
     "js-yaml": ">=3.13.1",
     "ts-jest": "^23.10.5",
