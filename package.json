@@ -1,6 +1,6 @@
 {
   "name": "action_switcher",
-  "version": "2.1.9",
+  "version": "2.1.10",
   "description": "Action switcher for redux",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
