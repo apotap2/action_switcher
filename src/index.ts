@@ -71,13 +71,13 @@ export class ActionSwitcher<T> {
 
 	public attachChild<С extends keyof T>(field: С, child: ActionSwitcher<any>, useFieldInType: boolean = false) {
 		if (this._children.hasOwnProperty(field) || this._arrayChildren.hasOwnProperty(field)) {
-			throw new Error(`already has action switcher for the field ${field}`);
+			throw new Error(`already has action switcher for the field ${String(field)}`);
 		}
 
 		this._children[field as string] = child;
 		Object.keys(child._rules).forEach((TYPE) => {
 			const factory = child._rules[TYPE];
-			const typeToUse = useFieldInType ? `${field}/${TYPE}` : TYPE;
+			const typeToUse = useFieldInType ? `${String(field)}/${TYPE}` : TYPE;
 			factory.TYPE = typeToUse;
 			const oldApplier = factory.apply;
 			const newApplier = (state: T, action: IAction): T => {
@@ -101,13 +101,13 @@ export class ActionSwitcher<T> {
 		useFieldInType: boolean = false,
 	) {
 		if (this._children.hasOwnProperty(field) || this._arrayChildren.hasOwnProperty(field)) {
-			throw new Error(`already has action switcher for the field ${field}`);
+			throw new Error(`already has action switcher for the field ${String(field)}`);
 		}
 
 		this._arrayChildren[field as string] = { switcher: child, initSize };
 		Object.keys(child._rules).forEach((TYPE) => {
 			const factory = child._rules[TYPE];
-			const typeToUse = useFieldInType ? `${field}/${TYPE}` : TYPE;
+			const typeToUse = useFieldInType ? `${String(field)}/${TYPE}` : TYPE;
 			factory.TYPE = typeToUse;
 			const oldApplier = factory.apply;
 			const newApplier = (state: T, action: IAction): T => {
